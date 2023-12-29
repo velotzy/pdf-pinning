@@ -3,4 +3,6 @@
 
 import 'dart:ui';
 
-const Color drawColor = Color(0xff1280b3);
+import 'package:flutter/material.dart';
+
+const Color drawColor = Colors.red;

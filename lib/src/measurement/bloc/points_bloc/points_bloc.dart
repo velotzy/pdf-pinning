@@ -20,19 +20,21 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
   final _logger = Logger(LogDistricts.POINTS_BLOC);
   final List<StreamSubscription> _streamSubscriptions = [];
 
-  MeasurementRepository _measureRepository;
-  MetadataRepository _metadataRepository;
+  late MeasurementRepository _measureRepository;
+  late MetadataRepository _metadataRepository;
 
-  StreamSubscription _onlyPointsSubscription;
-  StreamSubscription _pointsAndDistancesSubscription;
+  StreamSubscription? _onlyPointsSubscription;
+  StreamSubscription? _pointsAndDistancesSubscription;
 
-  Function(List<Offset>) _pointsListener;
-  Function(DrawingHolder) _pointsAndDistanceListener;
+  late Function(List<Offset>) _pointsListener;
+  late Function(DrawingHolder) _pointsAndDistanceListener;
 
-  Offset _viewCenter;
-  double _tolerance;
+  late Offset _viewCenter;
+  late double _tolerance;
 
   PointsBloc() : super(PointsEmptyState()) {
+
+    on<PointsEvent>(mapEventToState);
     _pointsListener = (points) => add(PointsOnlyEvent(points));
     _pointsAndDistanceListener = (holder) =>
         add(PointsAndDistancesEvent(holder.points, holder.distances));
@@ -44,16 +46,18 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
         .add(_metadataRepository.showDistances.listen((showDistances) {
       if (showDistances) {
         if (_pointsAndDistancesSubscription == null) {
-          _onlyPointsSubscription?.cancel();
-          _onlyPointsSubscription = null;
+          _onlyPointsSubscription?.cancel().then((value) {
+            _onlyPointsSubscription = null;
+          });
 
           _pointsAndDistancesSubscription = _measureRepository.drawingHolder
               .listen(_pointsAndDistanceListener);
         }
       } else {
         if (_onlyPointsSubscription == null) {
-          _pointsAndDistancesSubscription?.cancel();
-          _pointsAndDistancesSubscription = null;
+          _pointsAndDistancesSubscription?.cancel().then((value) {
+            _pointsAndDistancesSubscription = null;
+          });
 
           _onlyPointsSubscription =
               _measureRepository.points.listen(_pointsListener);
@@ -81,17 +85,20 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
     return super.close();
   }
 
-  @override
-  Stream<PointsState> mapEventToState(PointsEvent event) async* {
+  
+  Future<void> mapEventToState(
+      PointsEvent event,
+      Emitter<PointsState> emit,
+  ) async {
     if (event.points.isEmpty) {
-      yield PointsEmptyState();
+      emit( PointsEmptyState());
     } else if (event.points.length == 1) {
-      yield PointsSingleState(event.points[0]);
+      emit( PointsSingleState(event.points[0]));
     } else {
       if (event is PointsOnlyEvent) {
-        yield PointsOnlyState(event.points);
+        emit( PointsOnlyState(event.points));
       } else if (event is PointsAndDistancesEvent) {
-        yield _mapMultiplePointsWithDistancesToState(event);
+        emit( _mapMultiplePointsWithDistancesToState(event));
       }
     }
   }

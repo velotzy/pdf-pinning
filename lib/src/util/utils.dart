@@ -50,9 +50,9 @@ extension OffsetExtension on Offset {
 
     return Offset(
         (currentOffset.dx + target.dx).fit(
-            -mySize.width + thresholdOffset, bounds.width - thresholdOffset),
+            -mySize.width + thresholdOffset, bounds.width - thresholdOffset).toDouble(),
         (currentOffset.dy + target.dy).fit(
-            -mySize.height + thresholdOffset, bounds.height - thresholdOffset));
+            -mySize.height + thresholdOffset, bounds.height - thresholdOffset).toDouble());
   }
 }
 

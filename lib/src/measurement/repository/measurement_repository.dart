@@ -28,8 +28,8 @@ class MeasurementRepository {
   final _drawingHolder = BehaviorSubject<DrawingHolder>();
   final MetadataRepository _metadataRepository;
 
-  MeasurementController _controller;
-  LengthUnit _transformationFactor;
+  MeasurementController? _controller;
+  LengthUnit? _transformationFactor;
   double _imageToDocumentScaleFactor = 1.0;
 
   int _currentIndex = -1;
@@ -218,7 +218,7 @@ class MeasurementRepository {
     var distances = [..._distances.value];
 
     distances.setRange(
-        max(0, index - 1), min(distances.length, index + 1), [null, null]);
+        max(0, index - 1), min(distances.length, index + 1), [ ...distances ]);
     _publishDistances(distances);
 
     _logger.log('started moving point with index: $index');
@@ -233,14 +233,14 @@ class MeasurementRepository {
   void _synchronizeDistances() {
     if (_transformationFactor != null && _absolutePoints.length >= 2) {
       var distances = <LengthUnit>[];
-      _absolutePoints.doInBetween((start, end) =>
-          distances.add(_transformationFactor * (start - end).distance));
+      _absolutePoints.doInBetween((Offset start, Offset end) =>
+          distances.add(_transformationFactor! * (start - end).distance));
       _publishDistances(distances);
 
-      _controller?.distances = distances.map((unit) => unit.value).toList();
+      _controller!.distances = distances.map((unit) => unit.value).toList();
     } else if (_absolutePoints.length == 1) {
       _publishDistances([]);
-      _controller?.distances = [];
+      _controller!.distances = [];
     }
   }
 }

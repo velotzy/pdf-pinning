@@ -7,7 +7,7 @@ import 'package:document_measure/document_measure.dart';
 import 'package:equatable/equatable.dart';
 
 class Holder extends Equatable {
-  final Offset start, end;
+  final dynamic start, end;
   final LengthUnit distance;
 
   Holder(this.start, this.end, {this.distance = const Millimeter(0)});

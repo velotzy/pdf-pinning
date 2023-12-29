@@ -1,9 +1,10 @@
 /// Copyright (c) 2020 arconsis IT-Solutions GmbH
 /// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
-
-import 'dart:ui';
+import 'dart:ui' as ui;
 
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
+
 
 abstract class MagnificationState extends Equatable {}
 
@@ -16,11 +17,11 @@ class MagnificationActiveState extends MagnificationState {
   final Offset position;
   final Offset absolutePosition;
   final Offset magnificationOffset;
-  final Image backgroundImage;
+  final ui.Image backgroundImage;
   final double imageScaleFactor;
 
   MagnificationActiveState(this.position, this.magnificationOffset,
-      {this.absolutePosition, this.backgroundImage, this.imageScaleFactor});
+      { this.absolutePosition = Offset.zero, required this.backgroundImage , this.imageScaleFactor = 0});
 
   @override
   List<Object> get props => [

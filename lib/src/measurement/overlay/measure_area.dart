@@ -1,6 +1,6 @@
 /// Copyright (c) 2020 arconsis IT-Solutions GmbH
 /// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
-
+import 'dart:ui' as ui;
 import 'package:document_measure/document_measure.dart';
 import 'package:document_measure/src/measurement/bloc/magnification_bloc/magnification_bloc.dart';
 import 'package:document_measure/src/measurement/bloc/magnification_bloc/magnification_state.dart';
@@ -21,9 +21,9 @@ class MeasureArea extends StatelessWidget {
   final Paint dotPaint = Paint(), pathPaint = Paint();
 
   MeasureArea(
-      {@required this.pointStyle,
-      @required this.magnificationStyle,
-      @required this.distanceStyle}) {
+      {required this.pointStyle,
+      required this.magnificationStyle,
+      required this.distanceStyle}) {
     var lineType = pointStyle.lineType;
     double strokeWidth;
     if (lineType is SolidLine) {
@@ -112,7 +112,7 @@ class MeasureArea extends StatelessWidget {
     return widgets;
   }
 
-  CustomPaint _pointPainter(Offset first, Offset last) {
+  CustomPaint _pointPainter(dynamic first, dynamic last) {
     return CustomPaint(
       foregroundPainter: MeasurePainter(
         start: first,

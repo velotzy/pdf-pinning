@@ -23,25 +23,27 @@ class ScaleBloc extends Bloc<ScaleEvent, ScaleState>
   final double _minScale = 1.0;
   final double _maxScale = 10.0;
 
-  MetadataRepository _metadataRepository;
+  late MetadataRepository _metadataRepository;
 
-  Offset _translateStart;
+  late Offset _translateStart;
   Offset _workingTranslate = Offset(0, 0);
   Offset _currentTranslate = Offset(0, 0);
 
-  Size _screenSize;
-  Size _viewSize;
+  Size _screenSize = Size.zero;
+  Size _viewSize = Size.zero;
   Offset _defaultOffset = Offset(0, 0);
 
   double _currentScale = 1.0;
   double _accumulatedScale = 1.0;
   double _doubleTapScale = 1.0;
-  double _originalScale;
+  late double _originalScale;
 
-  bool _measure;
+  late bool _measure;
 
   ScaleBloc() : super(ScaleState(Offset(0, 0), 1.0, Matrix4.identity())) {
     _metadataRepository = GetIt.I<MetadataRepository>();
+
+    on<ScaleEvent>(mapEventToState);
 
     subscriptions.add(_metadataRepository.measurement
         .listen((measure) => _measure = measure));
@@ -91,7 +93,7 @@ class ScaleBloc extends Bloc<ScaleEvent, ScaleState>
             _defaultOffset;
       } else {
         _accumulatedScale =
-            (_currentScale * event.scale).fit(_minScale, _maxScale);
+            (_currentScale * event.scale).fit(_minScale, _maxScale).toDouble();
       }
     } else if (event is ScaleDoubleTapEvent) {
       if (_currentScale == 1.0) {
@@ -117,34 +119,37 @@ class ScaleBloc extends Bloc<ScaleEvent, ScaleState>
     return super.close();
   }
 
-  @override
-  Stream<ScaleState> mapEventToState(ScaleEvent event) async* {
+  
+  Future<void> mapEventToState(
+      ScaleEvent event,
+      Emitter<ScaleState> emit,
+  ) async {
     final offset = _getTranslate();
 
     if (event is ScaleOriginalEvent) {
-      yield ScaleState(
+      emit( ScaleState(
         offset,
         _originalScale,
         Matrix4.identity()
           ..translate(offset.dx, offset.dy)
           ..scale(_originalScale),
-      );
+      ));
     } else if (event is ScaleResetEvent) {
-      yield ScaleState(
+      emit( ScaleState(
         _defaultOffset,
         1.0,
         Matrix4.identity()
           ..translate(_defaultOffset.dx, _defaultOffset.dy)
           ..scale(1.0),
-      );
+      ));
     } else {
-      yield ScaleState(
+      emit( ScaleState(
         offset,
         _accumulatedScale,
         Matrix4.identity()
           ..translate(offset.dx, offset.dy)
           ..scale(_accumulatedScale),
-      );
+      ));
     }
   }
 
@@ -169,11 +174,10 @@ class ScaleBloc extends Bloc<ScaleEvent, ScaleState>
   Offset _getTranslate() => _defaultOffset + _workingTranslate;
 
   void _updateDefaultOffset() {
-    if (_screenSize == null || _viewSize == null) return;
-
+    
     _defaultOffset = Offset((_screenSize.width - _viewSize.width) / 2.0,
         (_screenSize.height - _viewSize.height) / 2.0);
-
+    
     add(ScaleCenterUpdatedEvent());
     _registerResizing();
   }

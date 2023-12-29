@@ -14,8 +14,8 @@ import 'input_state.dart';
 class InputBloc extends Bloc<InputEvent, InputState> {
   final List<StreamSubscription> _streamSubscription = [];
 
-  MeasurementRepository _measurementRepository;
-  MetadataRepository _metadataRepository;
+  late MeasurementRepository _measurementRepository;
+  late MetadataRepository _metadataRepository;
 
   bool _measure = false;
   bool _delete = false;
@@ -24,8 +24,12 @@ class InputBloc extends Bloc<InputEvent, InputState> {
     _metadataRepository = GetIt.I<MetadataRepository>();
     _measurementRepository = GetIt.I<MeasurementRepository>();
 
+    on<InputEvent>(mapEventToState);
+
     _streamSubscription.add(_metadataRepository.measurement
         .listen((measure) => _measure = measure));
+
+        
   }
 
   @override
@@ -64,24 +68,26 @@ class InputBloc extends Bloc<InputEvent, InputState> {
     return super.close();
   }
 
-  @override
-  Stream<InputState> mapEventToState(InputEvent event) async* {
+  Future<void> mapEventToState(
+      InputEvent event,
+      Emitter<InputState> emit,
+  ) async {
     if (_measure) {
       if (_delete && _metadataRepository.isInDeleteRegion(event.position)) {
         if (event is InputMoveEvent || event is InputDownEvent) {
-          yield InputDeleteRegionState(event.position);
+          emit( InputDeleteRegionState(event.position));
         } else if (event is InputUpEvent) {
-          yield InputDeleteState();
+          emit(InputDeleteState());
         }
       } else {
         if (event is InputMoveEvent || event is InputDownEvent) {
-          yield InputStandardState(event.position);
+          emit(InputStandardState(event.position));
         } else if (event is InputUpEvent) {
-          yield InputEndedState(event.position);
+          emit( InputEndedState(event.position));
         }
       }
     } else {
-      yield InputEmptyState();
+      emit( InputEmptyState());
     }
   }
 }

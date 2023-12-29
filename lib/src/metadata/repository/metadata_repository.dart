@@ -32,7 +32,7 @@ class MetadataRepository {
   final _zoomLevel = BehaviorSubject<double>.seeded(1.0);
   final _contentPosition = BehaviorSubject<Offset>();
 
-  Rect _deleteRegion;
+  late Rect _deleteRegion;
 
   MetadataRepository();
 
@@ -98,11 +98,11 @@ class MetadataRepository {
   }
 
   void registerStartupValuesChange({
-    @widget.required MeasurementInformation measurementInformation,
-    @widget.required bool measure,
-    @widget.required bool showDistance,
-    @widget.required MagnificationStyle magnificationStyle,
-    @widget.required MeasurementController controller,
+    required MeasurementInformation measurementInformation,
+    required bool measure,
+    required bool showDistance,
+    required MagnificationStyle magnificationStyle,
+    required MeasurementController controller,
   }) {
     _measurementInformation.value = measurementInformation;
     _unitOfMeasurement.value = measurementInformation.targetLengthUnit;
@@ -186,13 +186,14 @@ class MetadataRepository {
           .toDouble();
 
   void _updateImageToDocumentFactor(Size viewSize) {
-    if (_screenSize.value == null) return;
-
-    if (isDocumentWidthAlignedWithScreenWidth(viewSize)) {
-      _imageToDocumentFactor.value = _getDocumentWidth() / viewSize.width;
-    } else {
-      _imageToDocumentFactor.value = _getDocumentHeight() / viewSize.height;
+    if (_screenSize.hasValue) {
+      if (isDocumentWidthAlignedWithScreenWidth(viewSize)) {
+        _imageToDocumentFactor.value = _getDocumentWidth() / viewSize.width;
+      } else {
+        _imageToDocumentFactor.value = _getDocumentHeight() / viewSize.height;
+      }
     }
+    
   }
 
   void _updateTransformationFactor() async {

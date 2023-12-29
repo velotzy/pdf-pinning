@@ -204,8 +204,8 @@ class MeasurementInformation extends Equatable {
   final LengthUnit documentHeightInLengthUnits;
 
   const MeasurementInformation({
-    @required this.documentWidthInLengthUnits,
-    @required this.documentHeightInLengthUnits,
+    required this.documentWidthInLengthUnits,
+    required this.documentHeightInLengthUnits,
     this.scale = 1.0,
     this.targetLengthUnit = const Millimeter.asUnit(),
   });

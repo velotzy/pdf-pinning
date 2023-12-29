@@ -32,11 +32,11 @@ class MetadataStartedEvent extends MetadataEvent {
   final MeasurementController controller;
 
   MetadataStartedEvent({
-    @required this.measure,
-    @required this.showDistances,
-    @required this.measurementInformation,
-    @required this.magnificationStyle,
-    @required this.controller,
+    required this.measure,
+    required this.showDistances,
+    required this.measurementInformation,
+    required this.magnificationStyle,
+    required this.controller,
   });
 
   @override

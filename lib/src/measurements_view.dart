@@ -68,14 +68,14 @@ class Measurements extends StatelessWidget {
   final bool showDistanceOnLine;
   final MeasurementInformation measurementInformation;
   final double magnificationZoomFactor;
-  final MeasurementController controller;
+  final MeasurementController? controller;
   final PointStyle pointStyle;
   final MagnificationStyle magnificationStyle;
   final DistanceStyle distanceStyle;
 
   Measurements({
-    Key key,
-    @required this.child,
+    Key? key,
+    required this.child,
     this.deleteChild = const _DeleteChild(),
     this.deleteChildAlignment = Alignment.bottomCenter,
     this.measure = true,
@@ -134,7 +134,7 @@ class _Measurements extends StatelessWidget {
   final bool showDistanceOnLine;
   final MeasurementInformation measurementInformation;
   final double magnificationZoomFactor;
-  final MeasurementController controller;
+  final MeasurementController? controller;
   final PointStyle pointStyle;
   final MagnificationStyle magnificationStyle;
   final DistanceStyle distanceStyle;
@@ -156,14 +156,13 @@ class _Measurements extends StatelessWidget {
   void _setBackgroundImageToBloc(BuildContext context, double zoom) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (_childKey.currentContext != null) {
-        RenderRepaintBoundary boundary =
-            _childKey.currentContext.findRenderObject();
+        var boundary =
+            _childKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
 
         if (boundary.size.width > 0.0 && boundary.size.height > 0.0) {
           final pixelRatio =
               min(10.0, max(1.0, magnificationZoomFactor * zoom));
           final image = await boundary.toImage(pixelRatio: pixelRatio);
-
           if (image.width > 0) {
             BlocProvider.of<MetadataBloc>(context)
                 .add(MetadataBackgroundEvent(image, boundary.size));
@@ -179,30 +178,30 @@ class _Measurements extends StatelessWidget {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (_deleteKey.currentContext != null &&
           _parentKey.currentContext != null) {
-        var parentObject = _parentKey.currentContext.findRenderObject();
-        var deleteObject = _deleteKey.currentContext.findRenderObject();
+        var parentObject = _parentKey.currentContext!.findRenderObject();
+        var deleteObject = _deleteKey.currentContext!.findRenderObject();
 
         final translation =
-            deleteObject.getTransformTo(parentObject).getTranslation();
-        var deleteSize = _deleteKey.currentContext.size;
+            deleteObject!.getTransformTo(parentObject).getTranslation();
+        var deleteSize = _deleteKey.currentContext!.size;
 
         _logger.log('Translation is: $translation size is $deleteSize');
 
         BlocProvider.of<MetadataBloc>(context)
-            ?.add(MetadataScreenSizeEvent(_parentKey.currentContext.size));
+            .add(MetadataScreenSizeEvent(_parentKey.currentContext!.size!));
         BlocProvider.of<MetadataBloc>(context)?.add(MetadataDeleteRegionEvent(
-            Offset(translation.x, translation.y), deleteSize));
+            Offset(translation.x, translation.y), deleteSize!));
       }
     });
   }
 
   void _setStartupArgumentsToBloc(BuildContext context) {
-    BlocProvider.of<MetadataBloc>(context)?.add(MetadataStartedEvent(
+    BlocProvider.of<MetadataBloc>(context).add(MetadataStartedEvent(
       measurementInformation: measurementInformation,
       measure: measure,
       showDistances: showDistanceOnLine,
       magnificationStyle: magnificationStyle,
-      controller: controller,
+      controller: controller!,
     ));
   }
 
@@ -212,7 +211,7 @@ class _Measurements extends StatelessWidget {
 
     return Container(
       key: _parentKey,
-      color: drawColor,
+      color: Colors.white,
       child: BlocBuilder<ScaleBloc, ScaleState>(
         builder: (context, scaleState) => _overlay(context, scaleState),
       ),
@@ -233,15 +232,17 @@ class _Measurements extends StatelessWidget {
                   MagnificationBloc(BlocProvider.of<InputBloc>(context))),
         ],
         child: Listener(
-          onPointerDown: (PointerDownEvent event) =>
+          onPointerDown: (PointerEvent event) =>
               BlocProvider.of<InputBloc>(context)
                   .add(InputDownEvent(event.localPosition)),
-          onPointerMove: (PointerMoveEvent event) =>
+          onPointerMove: (PointerEvent event) =>
               BlocProvider.of<InputBloc>(context)
                   .add(InputMoveEvent(event.localPosition)),
-          onPointerUp: (PointerUpEvent event) =>
-              BlocProvider.of<InputBloc>(context)
-                  .add(InputUpEvent(event.localPosition)),
+          onPointerUp: (PointerEvent event) {
+            BlocProvider.of<InputBloc>(context)
+                  .add(InputUpEvent(event.localPosition));
+          }
+              ,
           child: Stack(
             children: <Widget>[
               Transform(

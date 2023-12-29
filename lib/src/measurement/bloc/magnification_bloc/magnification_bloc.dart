@@ -2,7 +2,9 @@
 /// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
 
 import 'dart:async';
-import 'dart:ui';
+import 'dart:ui' as ui;
+
+import 'package:flutter/material.dart';
 
 import 'package:document_measure/src/input_bloc/input_bloc.dart';
 import 'package:document_measure/src/input_bloc/input_state.dart';
@@ -19,18 +21,20 @@ class MagnificationBloc extends Bloc<MagnificationEvent, MagnificationState> {
   final InputBloc inputBloc;
   final List<StreamSubscription> _streamSubscriptions = [];
 
-  MeasurementRepository _measureRepository;
-  MetadataRepository _metadataRepository;
+  late MeasurementRepository _measureRepository;
+  late MetadataRepository _metadataRepository;
 
-  Image _backgroundImage;
-  double _imageScaleFactor;
-  Size _viewSize;
-  double _magnificationRadius;
-  Offset _magnificationOffset;
+  ui.Image? _backgroundImage ;
+  late double _imageScaleFactor;
+  Size _viewSize = Size.zero;
+  late double _magnificationRadius;
+  late Offset _magnificationOffset;
 
   MagnificationBloc(this.inputBloc) : super(MagnificationInactiveState()) {
     _measureRepository = GetIt.I<MeasurementRepository>();
     _metadataRepository = GetIt.I<MetadataRepository>();
+
+    on<MagnificationEvent>(mapEventToState);
 
     _streamSubscriptions.add(_metadataRepository.backgroundImage
         .listen((image) => _backgroundImage = image));
@@ -45,7 +49,8 @@ class MagnificationBloc extends Bloc<MagnificationEvent, MagnificationState> {
           _defaultMagnificationOffset.dy + radius);
     }));
 
-    _streamSubscriptions.add(inputBloc.listen((state) {
+    
+    _streamSubscriptions.add(inputBloc.stream.listen((state) {
       if (state is InputStandardState) {
         add(MagnificationShowEvent(state.position));
       } else if (state is InputEmptyState) {
@@ -60,7 +65,7 @@ class MagnificationBloc extends Bloc<MagnificationEvent, MagnificationState> {
     }));
   }
 
-  @override
+  
   Stream<Transition<MagnificationEvent, MagnificationState>>
       transformTransitions(
           Stream<Transition<MagnificationEvent, MagnificationState>>
@@ -77,7 +82,7 @@ class MagnificationBloc extends Bloc<MagnificationEvent, MagnificationState> {
               state.magnificationOffset,
               absolutePosition: _measureRepository
                   .convertIntoDocumentLocalTopLeftPosition(state.position),
-              backgroundImage: _backgroundImage,
+              backgroundImage: _backgroundImage!,
               imageScaleFactor: _imageScaleFactor,
             ));
       } else {
@@ -86,12 +91,15 @@ class MagnificationBloc extends Bloc<MagnificationEvent, MagnificationState> {
     });
   }
 
-  @override
-  Stream<MagnificationState> mapEventToState(MagnificationEvent event) async* {
+  
+  Future<void> mapEventToState(
+      MagnificationEvent event,
+      Emitter<MagnificationState> emit,
+  ) async {
     if (event is MagnificationShowEvent) {
-      yield _mapMagnificationShowToState(event);
+      emit( _mapMagnificationShowToState(event));
     } else if (event is MagnificationHideEvent) {
-      yield MagnificationInactiveState();
+      emit( MagnificationInactiveState());
     }
   }
 
@@ -106,7 +114,7 @@ class MagnificationBloc extends Bloc<MagnificationEvent, MagnificationState> {
     var magnificationPosition = event.position - _magnificationOffset;
 
     if (_magnificationGlassFitsWithoutModification(magnificationPosition)) {
-      return MagnificationActiveState(event.position, _magnificationOffset);
+      return MagnificationActiveState(event.position, _magnificationOffset, backgroundImage: _backgroundImage!);
     } else {
       var modifiedOffset = _magnificationOffset;
 
@@ -123,7 +131,7 @@ class MagnificationBloc extends Bloc<MagnificationEvent, MagnificationState> {
             modifiedOffset.dy);
       }
 
-      return MagnificationActiveState(event.position, modifiedOffset);
+      return MagnificationActiveState(event.position, modifiedOffset, backgroundImage: _backgroundImage!);
     }
   }
 

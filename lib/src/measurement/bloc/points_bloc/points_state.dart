@@ -11,7 +11,7 @@ abstract class PointsState extends Equatable {}
 
 class PointsEmptyState extends PointsState {
   @override
-  List<Object> get props => null;
+  List<Object> get props => [];
 }
 
 class PointsSingleState extends PointsState {

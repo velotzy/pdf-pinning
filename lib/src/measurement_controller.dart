@@ -37,7 +37,7 @@ class MeasurementValues extends Equatable {
 /// ```
 class MeasurementController {
   final BehaviorSubject<MeasurementValues> _currentValues = BehaviorSubject();
-  MeasurementFunction _function;
+  late MeasurementFunction _function;
 
   MeasurementController();
 
@@ -49,36 +49,40 @@ class MeasurementController {
   Stream<MeasurementValues> get measurements => _currentValues.stream;
 
   /// Returns the latest distances.
-  List<double> get distances => _currentValues.value?.distances;
+  List<double> get distances => _currentValues.value.distances;
 
   /// Only for internal use. Using it will return [distances] back to you in the [measurements] [Stream].
   set distances(List<double> distances) {
-    if (_currentValues.value?.distances == distances) {
+    if (_currentValues.hasValue) {
+    if (_currentValues.value.distances == distances) {
       return;
     }
 
     _currentValues.value = MeasurementValues(distances, tolerance);
-  }
+  }}
 
   /// Return the current tolerance.
   /// This might change as the user zooms in and out.
-  double get tolerance => _currentValues.value?.tolerance;
+  double get tolerance => _currentValues.value.tolerance;
 
   /// Only for internal use. Using it will return [tolerance] back to you in the [measurements] [Stream].
   set tolerance(double tolerance) {
-    if (_currentValues.value?.tolerance == tolerance) {
+    if (_currentValues.hasValue) {
+if (_currentValues.value.tolerance == tolerance) {
       return;
     }
 
     _currentValues.value = MeasurementValues(distances, tolerance);
+    }
+    
   }
 
   /// Zoom the content to life-size if possible.
   /// When the resulting zoom would be too large the call will be ignored to avoid performance issues and other problems.
-  bool zoomToLifeSize() => _function?.zoomToLifeSize();
+  bool zoomToLifeSize() => _function.zoomToLifeSize();
 
   /// Reset the zoom back to 1, which will fit the content into the view.
-  bool resetZoom() => _function?.resetZoom();
+  bool resetZoom() => _function.resetZoom();
 
   void close() {
     _currentValues.close();

@@ -34,13 +34,12 @@ class _MyAppState extends State<MyApp> {
   ];
   int unitIndex = 0;
 
-  MeasurementController controller;
+  MeasurementController controller = MeasurementController();
 
   @override
   void initState() {
     super.initState();
 
-    controller = MeasurementController();
   }
 
   Color getButtonColor(bool selected) {
@@ -56,7 +55,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          backgroundColor: Color(0xff1280b3),
+          backgroundColor: Colors.white,
           title: Row(
             children: <Widget>[
               IconButton(
@@ -92,7 +91,7 @@ class _MyAppState extends State<MyApp> {
               ),
               SizedBox.fromSize(
                 child: MaterialButton(
-                  shape: CircleBorder(),
+                  shape: RoundedRectangleBorder(borderRadius:BorderRadius.circular(4.0) ),
                   onPressed: () => setState(() =>
                       unitIndex = (unitIndex + 1) % unitsOfMeasurement.length),
                   child: Text(unitsOfMeasurement[unitIndex].getAbbreviation()),
@@ -118,17 +117,22 @@ class _MyAppState extends State<MyApp> {
             ],
           ),
         ),
-        body: Center(
-          child: Measurements(
-            child: Image.asset(
-              'assets/images/floorplan448x449mm.png',
-            ),
+        body:  Measurements(
+            child: Center(child: Text('data'),),
+            deleteChild: Container(
+            // child: Icon(
+            //   Icons.delete,
+            //   color: Colors.red,
+            // ),
+            // margin: EdgeInsets.only(bottom: 40),
+          ),
             measurementInformation: MeasurementInformation(
-              scale: 1 / 50.0,
+              scale: 1 / 1.0,
               documentWidthInLengthUnits: Millimeter(448),
               documentHeightInLengthUnits: Millimeter(449),
               targetLengthUnit: unitsOfMeasurement[unitIndex],
             ),
+            
             controller: controller,
             showDistanceOnLine: showDistanceOnLine,
             distanceStyle: DistanceStyle(
@@ -136,7 +140,7 @@ class _MyAppState extends State<MyApp> {
             ),
             measure: measure,
           ),
-        ),
+        
       ),
     );
   }
