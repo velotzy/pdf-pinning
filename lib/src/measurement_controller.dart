@@ -1,7 +1,9 @@
 /// Copyright (c) 2020 arconsis IT-Solutions GmbH
 /// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
 
+import 'package:document_measure/src/measurement/repository/measurement_repository.dart';
 import 'package:equatable/equatable.dart';
+import 'package:get_it/get_it.dart';
 import 'package:rxdart/rxdart.dart';
 
 /// Interface to offer zoom functionality.
@@ -85,6 +87,13 @@ if (_currentValues.value.tolerance == tolerance) {
   bool resetZoom() => _function.resetZoom();
 
   void close() {
+
+    
     _currentValues.close();
+  }
+
+  void clear () {
+    var measurementRepository = GetIt.I<MeasurementRepository>();
+    measurementRepository.removeAllPoint();
   }
 }

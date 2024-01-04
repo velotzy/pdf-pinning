@@ -114,11 +114,24 @@ class _MyAppState extends State<MyApp> {
                   },
                   icon:
                       Icon(Icons.zoom_out_map, color: getButtonColor(zoomed))),
+                      IconButton(
+                onPressed: () {
+                  controller.clear();
+                  setState(() {
+                    
+                  });
+                }
+                    ,
+                icon: Icon(
+                  Icons.delete,
+                  color: getButtonColor(showDistanceOnLine),
+                ),
+              ),
             ],
           ),
         ),
         body:  Measurements(
-            child: Center(child: Text('data'),),
+            child: Center(child: Image.asset('assets/images/tech_draw.png'),),
             deleteChild: Container(
             // child: Icon(
             //   Icons.delete,

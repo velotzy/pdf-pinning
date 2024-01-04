@@ -128,13 +128,14 @@ class MeasurementRepository {
   }
 
   void removeAllPoint() {
+    print('clear');
       _absolutePoints.clear();
       _publishPoints();
     
   }
 
   void dispose() {
-    removeAllPoint();
+    
     _points.close();
     _distances.close();
     _drawingHolder.close();
