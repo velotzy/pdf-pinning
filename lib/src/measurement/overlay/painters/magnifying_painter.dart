@@ -15,7 +15,7 @@ class MagnifyingPainter extends CustomPainter {
 
   late Offset _drawPosition;
   late RRect _outerCircle, _innerCircle;
-  late Rect _imageTargetRect, _imageSourceRect;
+  Rect? _imageTargetRect, _imageSourceRect;
 
   MagnifyingPainter(
       {required this.fingerPosition,
@@ -32,7 +32,7 @@ class MagnifyingPainter extends CustomPainter {
     _outerCircle = _innerCircle.inflate(style.outerCircleThickness);
 
     _imageSourceRect = Rect.fromCenter(
-        center: absolutePosition * imageScaleFactor,
+        center: fingerPosition * imageScaleFactor,
         width: diameter,
         height: diameter);
     _imageTargetRect = Rect.fromCenter(
@@ -51,9 +51,24 @@ class MagnifyingPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+
+    print('drawPosition $_drawPosition');
+    print('fingerPosition $fingerPosition');
     canvas.clipRRect(_outerCircle);
 
-    canvas.drawImageRect(image, _imageSourceRect, _imageTargetRect, _drawPaint);
+    canvas.drawImage(
+        image,
+        Offset(
+            _drawPosition.dx == fingerPosition.dx
+                ? -fingerPosition.dx
+                : _drawPosition.dx > fingerPosition.dx
+                    ? - (fingerPosition.dx - style.magnificationRadius) 
+                    : -  fingerPosition.dx,
+            _drawPosition.dy < fingerPosition.dy
+                ? -fingerPosition.dy - (style.magnificationRadius * 2)
+                : (style.magnificationRadius * 2) - fingerPosition.dy),
+        _drawPaint);
+    // canvas.drawImageRect(image, _imageSourceRect!, _imageTargetRect!, _drawPaint);
 
     canvas.drawDRRect(_outerCircle, _innerCircle, _drawPaint);
     canvas.drawLine(
