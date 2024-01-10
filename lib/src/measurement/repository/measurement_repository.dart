@@ -128,7 +128,6 @@ class MeasurementRepository {
   }
 
   void removeAllPoint() {
-    print('clear');
       _absolutePoints.clear();
       _publishPoints();
     

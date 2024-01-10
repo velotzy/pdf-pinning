@@ -65,6 +65,7 @@ class Measurements extends StatelessWidget {
   final Widget deleteChild;
   final Alignment deleteChildAlignment;
   final bool measure;
+  final bool isPerimeter;
   final bool showDistanceOnLine;
   final MeasurementInformation measurementInformation;
   final double magnificationZoomFactor;
@@ -79,6 +80,7 @@ class Measurements extends StatelessWidget {
     this.deleteChild = const _DeleteChild(),
     this.deleteChildAlignment = Alignment.bottomCenter,
     this.measure = true,
+    this.isPerimeter = false,
     this.showDistanceOnLine = true,
     this.measurementInformation = const MeasurementInformation.dinA4(),
     this.magnificationZoomFactor = 2.0,
@@ -109,6 +111,7 @@ class Measurements extends StatelessWidget {
         deleteChild,
         deleteChildAlignment,
         measure,
+        isPerimeter,
         showDistanceOnLine,
         measurementInformation,
         magnificationZoomFactor,
@@ -131,6 +134,7 @@ class _Measurements extends StatelessWidget {
   final Widget deleteChild;
   final Alignment deleteChildAlignment;
   final bool measure;
+  final bool isPerimeter;
   final bool showDistanceOnLine;
   final MeasurementInformation measurementInformation;
   final double magnificationZoomFactor;
@@ -144,6 +148,7 @@ class _Measurements extends StatelessWidget {
     this.deleteChild,
     this.deleteChildAlignment,
     this.measure,
+    this.isPerimeter,
     this.showDistanceOnLine,
     this.measurementInformation,
     this.magnificationZoomFactor,
@@ -257,6 +262,7 @@ class _Measurements extends StatelessWidget {
                 pointStyle: pointStyle,
                 magnificationStyle: magnificationStyle,
                 distanceStyle: distanceStyle,
+                isPerimeter: isPerimeter
               ),
               Align(
                 alignment: deleteChildAlignment,

@@ -74,3 +74,36 @@ class PointsAndDistanceActiveState extends PointsAndDistanceState {
     return super.toString() + ' nullIndex: $nullIndices';
   }
 }
+
+class PointsAndPolygonState extends PointsState {
+  final List<Holder> holders;
+  final Offset viewCenter;
+  final double tolerance;
+
+  PointsAndPolygonState(this.holders, this.viewCenter, this.tolerance);
+
+  @override
+  List<Object> get props => [holders, viewCenter, tolerance];
+
+  @override
+  String toString() {
+    return super.toString() +
+        ' drawingHolder: $holders, viewCenter: $viewCenter, tolerance: $tolerance';
+  }
+}
+
+class PointsAndPolygonActiveState extends PointsAndPolygonState {
+  final List<int> nullIndices;
+
+  PointsAndPolygonActiveState(List<Holder> holders, Offset viewCenter,
+      double tolerance, this.nullIndices)
+      : super(holders, viewCenter, tolerance);
+
+  @override
+  List<Object> get props => [holders, viewCenter, tolerance, nullIndices];
+
+  @override
+  String toString() {
+    return super.toString() + ' nullIndex: $nullIndices';
+  }
+}

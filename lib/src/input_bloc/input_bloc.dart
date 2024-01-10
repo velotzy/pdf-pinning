@@ -15,6 +15,7 @@ class InputBloc extends Bloc<InputEvent, InputState> {
   final List<StreamSubscription> _streamSubscription = [];
 
   late MeasurementRepository _measurementRepository;
+  late MeasurementRepository _measurementRepositoryPerimeter;
   late MetadataRepository _metadataRepository;
 
   bool _measure = false;
@@ -23,6 +24,7 @@ class InputBloc extends Bloc<InputEvent, InputState> {
   InputBloc() : super(InputEmptyState()) {
     _metadataRepository = GetIt.I<MetadataRepository>();
     _measurementRepository = GetIt.I<MeasurementRepository>();
+    _measurementRepositoryPerimeter = GetIt.I<MeasurementRepository>();
 
     on<InputEvent>(mapEventToState);
 

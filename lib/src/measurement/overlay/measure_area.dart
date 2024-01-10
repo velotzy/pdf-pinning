@@ -6,6 +6,8 @@ import 'package:document_measure/src/measurement/bloc/magnification_bloc/magnifi
 import 'package:document_measure/src/measurement/bloc/magnification_bloc/magnification_state.dart';
 import 'package:document_measure/src/measurement/bloc/points_bloc/points_bloc.dart';
 import 'package:document_measure/src/measurement/bloc/points_bloc/points_state.dart';
+import 'package:document_measure/src/measurement/overlay/painters/polygon_painter.dart';
+import 'package:document_measure/src/measurement/overlay/painters/size_painter.dart';
 import 'package:document_measure/src/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -19,11 +21,13 @@ class MeasureArea extends StatelessWidget {
   final MagnificationStyle magnificationStyle;
   final DistanceStyle distanceStyle;
   final Paint dotPaint = Paint(), pathPaint = Paint();
+  final bool isPerimeter;
 
   MeasureArea(
       {required this.pointStyle,
       required this.magnificationStyle,
-      required this.distanceStyle}) {
+      required this.distanceStyle,
+      this.isPerimeter = false}) {
     var lineType = pointStyle.lineType;
     double strokeWidth;
     if (lineType is SolidLine) {
@@ -65,14 +69,27 @@ class MeasureArea extends StatelessWidget {
       widgets.add(_pointPainter(state.point, state.point));
     } else if (state is PointsOnlyState) {
       widgets.addAll(_onlyPoints(state));
-    } else if (state is PointsAndDistanceActiveState) {
+    } else if (state is PointsAndDistanceActiveState && isPerimeter) {
+      widgets.addAll(_pointsAndPolygonWithSpace(state));
+    } else if (state is PointsAndDistanceState  && isPerimeter) {
+      widgets.addAll(_pointsAndPolygon(state));
+    }  else if (state is PointsAndDistanceActiveState) {
       widgets.addAll(_pointsAndDistancesWithSpace(state));
     } else if (state is PointsAndDistanceState) {
       widgets.addAll(_pointsAndDistances(state));
     }
 
     return Stack(
-      children: widgets,
+      children: widgets.asMap().entries.map((entry) {
+        print(entry.value.runtimeType);
+        // if (entry.key % 2 == 0) {
+        //   return entry.value;
+        // } else {
+        //   return Container();
+        // }
+return entry.value;
+        
+      }).toList(),
     );
   }
 
@@ -112,6 +129,34 @@ class MeasureArea extends StatelessWidget {
     return widgets;
   }
 
+  Iterable<Widget> _pointsAndPolygonWithSpace(
+      PointsAndDistanceActiveState state) {
+    var widgets = <Widget>[];
+
+    state.holders.asMap().forEach((index, holder) {
+      
+      widgets.add(_sizePainter(holder.start, holder.end,
+            state.tolerance, state.viewCenter));
+      widgets.add(_polygonPainter(holder.start, holder.end));
+      
+    });
+
+    return widgets;
+  }
+
+  List<Widget> _pointsAndPolygon(PointsAndDistanceState state) {
+    var widgets = <Widget>[];
+
+    state.holders.forEach((holder) {
+      
+      widgets.add(_polygonPainter(holder.start, holder.end));
+      widgets.add(_sizePainter(holder.start, holder.end,
+            state.tolerance, state.viewCenter));
+    });
+
+    return widgets;
+  }
+
   CustomPaint _pointPainter(dynamic first, dynamic last) {
     return CustomPaint(
       foregroundPainter: MeasurePainter(
@@ -134,6 +179,31 @@ class MeasureArea extends StatelessWidget {
         tolerance: tolerance,
         viewCenter: viewCenter,
         style: distanceStyle,
+      ),
+    );
+  }
+
+  CustomPaint _sizePainter(Offset first, Offset last,
+      double tolerance, Offset viewCenter) {
+    return CustomPaint(
+      foregroundPainter: SizePainter(
+        start: first,
+        end: last,
+        tolerance: tolerance,
+        viewCenter: viewCenter,
+        style: distanceStyle,
+      ),
+    );
+  }
+
+  CustomPaint _polygonPainter(dynamic first, dynamic last) {
+    return CustomPaint(
+      foregroundPainter: PolygonPainter(
+        start: first,
+        end: last,
+        style: pointStyle,
+        dotPaint: dotPaint,
+        pathPaint: pathPaint,
       ),
     );
   }
