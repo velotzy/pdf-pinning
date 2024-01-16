@@ -50,6 +50,19 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
+  int _selectedIndex = 0;
+  final listController = [
+    MeasurementController(),
+    MeasurementController(),
+    MeasurementController()
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -130,7 +143,7 @@ class _MyAppState extends State<MyApp> {
             ],
           ),
         ),
-        body:  Measurements(
+        body: Measurements(
             child: Center(child: Image.asset('assets/images/tech_draw.png'),),
             deleteChild: Container(
             // child: Icon(
@@ -141,19 +154,38 @@ class _MyAppState extends State<MyApp> {
           ),
             measurementInformation: MeasurementInformation(
               scale: 1 / 1.0,
-              documentWidthInLengthUnits: Millimeter(448),
-              documentHeightInLengthUnits: Millimeter(449),
+              documentWidthInLengthUnits: Millimeter(210),
+              documentHeightInLengthUnits: Millimeter(297),
               targetLengthUnit: unitsOfMeasurement[unitIndex],
             ),
             
-            controller: controller,
+            controller: listController[_selectedIndex],
             showDistanceOnLine: showDistanceOnLine,
             distanceStyle: DistanceStyle(
               showTolerance: showTolerance,
             ),
-            measure: measure,
+            measure: true,
+            isPerimeter: measure,
           ),
-        
+        bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.business),
+            label: 'Business',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.school),
+            label: 'School',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.amber[800],
+        onTap: _onItemTapped,
+      ),
       ),
     );
   }

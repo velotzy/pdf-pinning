@@ -239,13 +239,13 @@ class _Measurements extends StatelessWidget {
         child: Listener(
           onPointerDown: (PointerEvent event) =>
               BlocProvider.of<InputBloc>(context)
-                  .add(InputDownEvent(event.localPosition)),
+                  .add(InputDownEvent(event.localPosition, isPerimeter)),
           onPointerMove: (PointerEvent event) =>
               BlocProvider.of<InputBloc>(context)
-                  .add(InputMoveEvent(event.localPosition)),
+                  .add(InputMoveEvent(event.localPosition, isPerimeter)),
           onPointerUp: (PointerEvent event) {
             BlocProvider.of<InputBloc>(context)
-                  .add(InputUpEvent(event.localPosition));
+                  .add(InputUpEvent(event.localPosition, isPerimeter));
           }
               ,
           child: Stack(
@@ -262,7 +262,7 @@ class _Measurements extends StatelessWidget {
                 pointStyle: pointStyle,
                 magnificationStyle: magnificationStyle,
                 distanceStyle: distanceStyle,
-                isPerimeter: isPerimeter
+                
               ),
               Align(
                 alignment: deleteChildAlignment,

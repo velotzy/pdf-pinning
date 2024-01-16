@@ -8,9 +8,11 @@ import 'package:document_measure/src/measurement/bloc/points_bloc/points_bloc.da
 import 'package:document_measure/src/measurement/bloc/points_bloc/points_state.dart';
 import 'package:document_measure/src/measurement/overlay/painters/polygon_painter.dart';
 import 'package:document_measure/src/measurement/overlay/painters/size_painter.dart';
+import 'package:document_measure/src/measurement/repository/measurement_repository.dart';
 import 'package:document_measure/src/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 
 import 'painters/distance_painter.dart';
 import 'painters/magnifying_painter.dart';
@@ -21,13 +23,13 @@ class MeasureArea extends StatelessWidget {
   final MagnificationStyle magnificationStyle;
   final DistanceStyle distanceStyle;
   final Paint dotPaint = Paint(), pathPaint = Paint();
-  final bool isPerimeter;
+  final measurementRepository = GetIt.I<MeasurementRepository>();
 
   MeasureArea(
       {required this.pointStyle,
       required this.magnificationStyle,
       required this.distanceStyle,
-      this.isPerimeter = false}) {
+      }) {
     var lineType = pointStyle.lineType;
     double strokeWidth;
     if (lineType is SolidLine) {
@@ -63,16 +65,17 @@ class MeasureArea extends StatelessWidget {
   }
 
   Stack _pointsOverlay(PointsState state) {
+    
     var widgets = <Widget>[];
 
     if (state is PointsSingleState) {
-      widgets.add(_pointPainter(state.point, state.point));
+      widgets.add(_pointPainter(state.point, state.point, false));
     } else if (state is PointsOnlyState) {
       widgets.addAll(_onlyPoints(state));
-    } else if (state is PointsAndDistanceActiveState && isPerimeter) {
-      widgets.addAll(_pointsAndPolygonWithSpace(state));
-    } else if (state is PointsAndDistanceState  && isPerimeter) {
-      widgets.addAll(_pointsAndPolygon(state));
+    // } else if (state is PointsAndDistanceActiveState ) {
+    //   widgets.addAll(_pointsAndPolygonWithSpace(state));
+    // } else if (state is PointsAndDistanceState) {
+    //   widgets.addAll(_pointsAndPolygon(state));
     }  else if (state is PointsAndDistanceActiveState) {
       widgets.addAll(_pointsAndDistancesWithSpace(state));
     } else if (state is PointsAndDistanceState) {
@@ -97,7 +100,7 @@ return entry.value;
     var widgets = <Widget>[];
 
     state.points
-        .doInBetween((start, end) => widgets.add(_pointPainter(start, end)));
+        .doInBetween((start, end) => widgets.add(_pointPainter(start, end, false)));
 
     return widgets;
   }
@@ -105,13 +108,26 @@ return entry.value;
   Iterable<Widget> _pointsAndDistancesWithSpace(
       PointsAndDistanceActiveState state) {
     var widgets = <Widget>[];
+    final listType = measurementRepository.getListType();
+
+    print('listType $listType');
 
     state.holders.asMap().forEach((index, holder) {
-      widgets.add(_pointPainter(holder.start, holder.end));
-      if (!state.nullIndices.contains(index)) {
-        widgets.add(_distancePainter(holder.start, holder.end, holder.distance,
-            state.tolerance, state.viewCenter));
+      
+      if (listType[index] == true) {
+        if (index % 2 == 0) {
+          widgets.add(_sizePainter(
+              holder.start, holder.end, state.tolerance, state.viewCenter));
+        }
+        widgets.add(_polygonPainter(holder.start, holder.end, index % 2 == 0));
+      } else {
+        widgets.add(_pointPainter(holder.start, holder.end, index % 2 == 0));
+        if (!state.nullIndices.contains(index) && index % 2 == 0) {
+          widgets.add(_distancePainter(holder.start, holder.end,
+              holder.distance, state.tolerance, state.viewCenter));
+        }
       }
+      
     });
 
     return widgets;
@@ -119,11 +135,23 @@ return entry.value;
 
   List<Widget> _pointsAndDistances(PointsAndDistanceState state) {
     var widgets = <Widget>[];
+    final listType = measurementRepository.getListType();
 
-    state.holders.forEach((holder) {
-      widgets.add(_pointPainter(holder.start, holder.end));
-      widgets.add(_distancePainter(holder.start, holder.end, holder.distance,
-          state.tolerance, state.viewCenter));
+    state.holders.asMap().forEach((index, holder) {
+      
+      if (listType[index] == true) {
+        widgets.add(_polygonPainter(holder.start, holder.end, index % 2 == 0));
+        if (index % 2 == 0) {
+          widgets.add(_sizePainter(
+              holder.start, holder.end, state.tolerance, state.viewCenter));
+        }
+      } else {
+        widgets.add(_pointPainter(holder.start, holder.end, index % 2 == 0));
+        if (index % 2 == 0) {
+          widgets.add(_distancePainter(holder.start, holder.end,
+              holder.distance, state.tolerance, state.viewCenter));
+        }
+      }
     });
 
     return widgets;
@@ -134,10 +162,10 @@ return entry.value;
     var widgets = <Widget>[];
 
     state.holders.asMap().forEach((index, holder) {
-      
+      if (index % 2 == 0){
       widgets.add(_sizePainter(holder.start, holder.end,
-            state.tolerance, state.viewCenter));
-      widgets.add(_polygonPainter(holder.start, holder.end));
+            state.tolerance, state.viewCenter));}
+      widgets.add(_polygonPainter(holder.start, holder.end, index % 2 ==0));
       
     });
 
@@ -147,17 +175,19 @@ return entry.value;
   List<Widget> _pointsAndPolygon(PointsAndDistanceState state) {
     var widgets = <Widget>[];
 
-    state.holders.forEach((holder) {
+    state.holders.asMap().forEach((index, holder) {
       
-      widgets.add(_polygonPainter(holder.start, holder.end));
+      widgets.add(_polygonPainter(holder.start, holder.end, index % 2 ==0));
+      if (index % 2 == 0){
       widgets.add(_sizePainter(holder.start, holder.end,
             state.tolerance, state.viewCenter));
+      }
     });
 
     return widgets;
   }
 
-  CustomPaint _pointPainter(dynamic first, dynamic last) {
+  CustomPaint _pointPainter(dynamic first, dynamic last, bool isDrawPath ) {
     return CustomPaint(
       foregroundPainter: MeasurePainter(
         start: first,
@@ -165,6 +195,7 @@ return entry.value;
         style: pointStyle,
         dotPaint: dotPaint,
         pathPaint: pathPaint,
+        isDrawPath: isDrawPath
       ),
     );
   }
@@ -196,7 +227,7 @@ return entry.value;
     );
   }
 
-  CustomPaint _polygonPainter(dynamic first, dynamic last) {
+  CustomPaint _polygonPainter(dynamic first, dynamic last, isDrawRect) {
     return CustomPaint(
       foregroundPainter: PolygonPainter(
         start: first,
@@ -204,6 +235,7 @@ return entry.value;
         style: pointStyle,
         dotPaint: dotPaint,
         pathPaint: pathPaint,
+        isDrawRect: isDrawRect
       ),
     );
   }

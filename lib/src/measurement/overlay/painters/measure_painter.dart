@@ -11,6 +11,8 @@ class MeasurePainter extends material.CustomPainter {
   final PointStyle style;
   final Paint dotPaint, pathPaint;
 
+  final bool isDrawPath;
+
   final Path _drawPath = Path();
   late double _dotRadius;
 
@@ -19,7 +21,8 @@ class MeasurePainter extends material.CustomPainter {
       required this.end,
       required this.style,
       required this.dotPaint,
-      required this.pathPaint}) {
+      required this.pathPaint,
+      required this.isDrawPath}) {
     _dotRadius = style.dotRadius;
 
     var lineType = style.lineType;
@@ -62,8 +65,10 @@ class MeasurePainter extends material.CustomPainter {
   void paint(Canvas canvas, Size size) {
     canvas.drawCircle(start, _dotRadius, dotPaint);
     canvas.drawCircle(end, _dotRadius, dotPaint);
-
-    canvas.drawPath(_drawPath, pathPaint);
+    if (isDrawPath) {
+      canvas.drawPath(_drawPath, pathPaint);
+    }
+    
   }
 
   @override

@@ -15,16 +15,14 @@ class InputBloc extends Bloc<InputEvent, InputState> {
   final List<StreamSubscription> _streamSubscription = [];
 
   late MeasurementRepository _measurementRepository;
-  late MeasurementRepository _measurementRepositoryPerimeter;
   late MetadataRepository _metadataRepository;
-
+  
   bool _measure = false;
   bool _delete = false;
 
   InputBloc() : super(InputEmptyState()) {
     _metadataRepository = GetIt.I<MetadataRepository>();
     _measurementRepository = GetIt.I<MeasurementRepository>();
-    _measurementRepositoryPerimeter = GetIt.I<MeasurementRepository>();
 
     on<InputEvent>(mapEventToState);
 
@@ -45,16 +43,16 @@ class InputBloc extends Bloc<InputEvent, InputState> {
             _delete = true;
           }
 
-          _measurementRepository.registerDownEvent(event.position);
+          _measurementRepository.registerDownEvent(event.position, event. isPerimeter);
           break;
         case InputMoveEvent:
-          _measurementRepository.registerMoveEvent(event.position);
+          _measurementRepository.registerMoveEvent(event.position, event.isPerimeter);
           break;
         case InputUpEvent:
           if (_delete && _metadataRepository.isInDeleteRegion(event.position)) {
             _measurementRepository.removeCurrentPoint();
           } else {
-            _measurementRepository.registerUpEvent(event.position);
+            _measurementRepository.registerUpEvent(event.position, event.isPerimeter);
           }
           break;
         default:

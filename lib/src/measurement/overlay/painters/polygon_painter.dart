@@ -11,6 +11,8 @@ class PolygonPainter extends material.CustomPainter {
   final PointStyle style;
   final Paint dotPaint, pathPaint;
 
+  final bool isDrawRect;
+
   final Path _drawPath = Path();
   late double _dotRadius;
 
@@ -19,7 +21,8 @@ class PolygonPainter extends material.CustomPainter {
       required this.end,
       required this.style,
       required this.dotPaint,
-      required this.pathPaint}) {
+      required this.pathPaint,
+      required this.isDrawRect}) {
     _dotRadius = style.dotRadius;
 
     var lineType = style.lineType;
@@ -64,9 +67,10 @@ class PolygonPainter extends material.CustomPainter {
     canvas.drawCircle(start, _dotRadius, dotPaint);
     canvas.drawCircle(end, _dotRadius, dotPaint);
     
-    // canvas.drawPath(_drawPath, pathPaint);
+    if (isDrawRect) {
 
     canvas.drawRect(rect, pathPaint);
+    }
   }
 
   @override

@@ -52,8 +52,8 @@ class MagnifyingPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
 
-    print('drawPosition $_drawPosition');
-    print('fingerPosition $fingerPosition');
+    // print('drawPosition $_drawPosition');
+    // print('fingerPosition $fingerPosition');
     canvas.clipRRect(_outerCircle);
 
     canvas.drawImage(

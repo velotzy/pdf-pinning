@@ -7,8 +7,9 @@ import 'package:equatable/equatable.dart';
 
 abstract class InputEvent extends Equatable {
   final Offset position;
+  final bool isPerimeter;
 
-  InputEvent(this.position);
+  InputEvent(this.position, this.isPerimeter);
 
   @override
   List<Object> get props => [position];
@@ -20,13 +21,13 @@ abstract class InputEvent extends Equatable {
 }
 
 class InputDownEvent extends InputEvent {
-  InputDownEvent(Offset position) : super(position);
+  InputDownEvent(Offset position, bool isPerimeter) : super(position, isPerimeter);
 }
 
 class InputMoveEvent extends InputEvent {
-  InputMoveEvent(Offset position) : super(position);
+  InputMoveEvent(Offset position, bool isPerimeter) : super(position, isPerimeter);
 }
 
 class InputUpEvent extends InputEvent {
-  InputUpEvent(Offset position) : super(position);
+  InputUpEvent(Offset position, bool isPerimeter) : super(position, isPerimeter);
 }

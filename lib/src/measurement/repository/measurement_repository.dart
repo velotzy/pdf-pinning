@@ -24,6 +24,7 @@ class MeasurementRepository {
   final _logger = Logger(LogDistricts.MEASUREMENT_REPOSITORY);
 
   final _points = BehaviorSubject<List<Offset>>.seeded([]);
+  
   final _distances = BehaviorSubject<List<LengthUnit>>.seeded([]);
   final _drawingHolder = BehaviorSubject<DrawingHolder>();
   final MetadataRepository _metadataRepository;
@@ -36,6 +37,7 @@ class MeasurementRepository {
   TouchState _currentState = TouchState.FREE;
 
   final List<Offset> _absolutePoints = [];
+  final List<bool> _listType = [];
   double _zoomLevel = 1.0;
   Offset _backgroundPosition = Offset(0, 0);
   Offset _viewCenterPosition = Offset(0, 0);
@@ -70,7 +72,7 @@ class MeasurementRepository {
 
   Stream<DrawingHolder> get drawingHolder => _drawingHolder.stream;
 
-  void registerDownEvent(Offset globalPosition) {
+  void registerDownEvent(Offset globalPosition, bool isPerimeter) {
     if (_currentState != TouchState.FREE) return;
     _currentState = TouchState.DOWN;
 
@@ -87,19 +89,19 @@ class MeasurementRepository {
                   globalPosition)
               .distance >
           40.0) {
-        _currentIndex = _addNewPoint(documentLocalCenteredPosition);
+        _currentIndex = _addNewPoint(documentLocalCenteredPosition, isPerimeter);
       } else {
         _currentIndex = closestIndex;
         _updatePoint(documentLocalCenteredPosition);
       }
     } else {
-      _currentIndex = _addNewPoint(documentLocalCenteredPosition);
+      _currentIndex = _addNewPoint(documentLocalCenteredPosition, isPerimeter);
     }
 
     _movementStarted(_currentIndex);
   }
 
-  void registerMoveEvent(Offset position) {
+  void registerMoveEvent(Offset position, bool isPerimeter) {
     if (_currentState != TouchState.DOWN && _currentState != TouchState.MOVE)
       return;
     _currentState = TouchState.MOVE;
@@ -108,7 +110,7 @@ class MeasurementRepository {
         position, _viewCenterPosition));
   }
 
-  void registerUpEvent(Offset position) {
+  void registerUpEvent(Offset position, bool isPerimeter) {
     if (_currentState != TouchState.DOWN && _currentState != TouchState.MOVE)
       return;
     _currentState = TouchState.UP;
@@ -129,8 +131,12 @@ class MeasurementRepository {
 
   void removeAllPoint() {
       _absolutePoints.clear();
+      _listType.clear();
       _publishPoints();
-    
+  }
+
+  List<bool> getListType() {
+      return _listType;
   }
 
   void dispose() {
@@ -173,6 +179,9 @@ class MeasurementRepository {
   void _publishPoints() {
     var relativePoints = _getRelativePoints();
 
+    // print('relativePoints $relativePoints');
+    // print('_absolutePoints $_absolutePoints');
+
     _logger.log(
         '\nimageToDocumentScaleFactor: ${_imageToDocumentScaleFactor.toStringAsFixed(2)}, '
         'zoomLevel: ${_zoomLevel.toStringAsFixed(2)}, '
@@ -185,8 +194,9 @@ class MeasurementRepository {
     _drawingHolder.add(DrawingHolder(relativePoints, _distances.value));
   }
 
-  int _addNewPoint(Offset point) {
+  int _addNewPoint(Offset point, bool isPerimeter) {
     _absolutePoints.add(point);
+    _listType.add(isPerimeter);
     _publishPoints();
 
     _logger.log('added point: $_absolutePoints');
