@@ -84,7 +84,7 @@ class MeasureArea extends StatelessWidget {
 
     return Stack(
       children: widgets.asMap().entries.map((entry) {
-        print(entry.value.runtimeType);
+        
         // if (entry.key % 2 == 0) {
         //   return entry.value;
         // } else {
@@ -110,14 +110,12 @@ return entry.value;
     var widgets = <Widget>[];
     final listType = measurementRepository.getListType();
 
-    print('listType $listType');
-
     state.holders.asMap().forEach((index, holder) {
       
       if (listType[index] == true) {
         if (index % 2 == 0) {
           widgets.add(_sizePainter(
-              holder.start, holder.end, state.tolerance, state.viewCenter));
+              holder.start, holder.end, holder.distance, state.tolerance, state.viewCenter));
         }
         widgets.add(_polygonPainter(holder.start, holder.end, index % 2 == 0));
       } else {
@@ -143,7 +141,7 @@ return entry.value;
         widgets.add(_polygonPainter(holder.start, holder.end, index % 2 == 0));
         if (index % 2 == 0) {
           widgets.add(_sizePainter(
-              holder.start, holder.end, state.tolerance, state.viewCenter));
+              holder.start, holder.end, holder.distance, state.tolerance, state.viewCenter));
         }
       } else {
         widgets.add(_pointPainter(holder.start, holder.end, index % 2 == 0));
@@ -151,36 +149,6 @@ return entry.value;
           widgets.add(_distancePainter(holder.start, holder.end,
               holder.distance, state.tolerance, state.viewCenter));
         }
-      }
-    });
-
-    return widgets;
-  }
-
-  Iterable<Widget> _pointsAndPolygonWithSpace(
-      PointsAndDistanceActiveState state) {
-    var widgets = <Widget>[];
-
-    state.holders.asMap().forEach((index, holder) {
-      if (index % 2 == 0){
-      widgets.add(_sizePainter(holder.start, holder.end,
-            state.tolerance, state.viewCenter));}
-      widgets.add(_polygonPainter(holder.start, holder.end, index % 2 ==0));
-      
-    });
-
-    return widgets;
-  }
-
-  List<Widget> _pointsAndPolygon(PointsAndDistanceState state) {
-    var widgets = <Widget>[];
-
-    state.holders.asMap().forEach((index, holder) {
-      
-      widgets.add(_polygonPainter(holder.start, holder.end, index % 2 ==0));
-      if (index % 2 == 0){
-      widgets.add(_sizePainter(holder.start, holder.end,
-            state.tolerance, state.viewCenter));
       }
     });
 
@@ -214,12 +182,13 @@ return entry.value;
     );
   }
 
-  CustomPaint _sizePainter(Offset first, Offset last,
+  CustomPaint _sizePainter(Offset first, Offset last, LengthUnit distance,
       double tolerance, Offset viewCenter) {
     return CustomPaint(
       foregroundPainter: SizePainter(
         start: first,
         end: last,
+        distance: distance,
         tolerance: tolerance,
         viewCenter: viewCenter,
         style: distanceStyle,

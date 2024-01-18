@@ -11,7 +11,7 @@ class SizePainter extends material.CustomPainter {
   static final double _log10 = log(10);
   static final double _offsetPerDigit = 4.57;
 
-  // final LengthUnit distance;
+  final LengthUnit distance;
   final Offset viewCenter;
 
   late Offset _zeroPoint;
@@ -19,14 +19,16 @@ class SizePainter extends material.CustomPainter {
   final Offset _zeroPointWithTolerance = Offset(-47, 0);
 
   late Paragraph _paragraph;
-  late double _radians;
+
   late Offset _position;
 
   ParagraphBuilder paragraphBuilder = ParagraphBuilder(
     ParagraphStyle(
       textAlign: TextAlign.center,
+      // textDirection: TextDirection.ltr,
       maxLines: 1,
       height: 0.5,
+      fontSize: 10,
       fontStyle: FontStyle.normal,
     ),
   );
@@ -34,7 +36,7 @@ class SizePainter extends material.CustomPainter {
   SizePainter(
       {required Offset start,
       required Offset end,
-      // required this.distance,
+      required this.distance,
       required this.viewCenter,
       required double tolerance,
       required DistanceStyle style}) {
@@ -44,65 +46,36 @@ class SizePainter extends material.CustomPainter {
       _zeroPoint = _zeroPointWithoutTolerance;
     }
 
-    // var distanceValue = distance.value;
-
-    // if (distanceValue > 0) {
-    //   _zeroPoint -= Offset(
-    //       ((log(distanceValue) / _log10).floor() - 1) * _offsetPerDigit, 0);
-    // }
-
-    double width = (end.dx - start.dx).abs();
-    double height = (end.dy - start.dy).abs();
-
-    
-
-    var sizeValue = width * height;
-
-    var difference = end - start;
-    _position = start + difference / 2.0;
-    // _radians = difference.direction;
-
-    // if (_radians.abs() >= pi / 2.0) {
-    //   _radians += pi;
-    // }
-
-    var positionToCenter = viewCenter - _position;
-
-    var offset = difference.normal();
-    offset *= offset.cosAlpha(positionToCenter).sign;
+    var areaValue = distance.value;
+    areaValue = ((start.dx - end.dx).abs() * (start.dy - end.dy).abs() ) * 0.2857142857;
 
     paragraphBuilder.pushStyle(TextStyle(color: style.textColor));
-    // if (style.showTolerance) {
-    //   paragraphBuilder.addText(
-    //       '${distanceValue?.toStringAsFixed(style.numDecimalPlaces)}±${tolerance.toStringAsFixed(style.numDecimalPlaces)}${distance.getAbbreviation()}');
-    // } else {
-    //   paragraphBuilder.addText(
-    //       '${distanceValue?.toStringAsFixed(style.numDecimalPlaces)}${distance.getAbbreviation()}');
-    // }
 
-
-
-    paragraphBuilder.addText('${sizeValue.toStringAsFixed(style.numDecimalPlaces)}');
+    paragraphBuilder.addText(
+        '${areaValue.toStringAsFixed(style.numDecimalPlaces)}${distance.getAbbreviation()}');
 
     _paragraph = paragraphBuilder.build();
-    _paragraph.layout(ParagraphConstraints(width: width));
-
-    _position += offset * 12;
+    _paragraph.layout(ParagraphConstraints(width: (start.dx - end.dx).abs()));
+    _position = Offset(
+        ((start.dx - end.dx).abs() / 2) + start.dx > end.dx ? end.dx : start.dx,
+        start.dy > end.dy
+            ? end.dy + ((start.dy - end.dy).abs() / 2)
+            : start.dy + ((start.dy - end.dy).abs() / 2));
   }
 
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.translate(_position.dx, _position.dy);
+    // canvas.translate(_position.dx, _position.dy);
     // canvas.rotate(_radians);
 
-    canvas.drawParagraph(_paragraph, _zeroPoint);
+    canvas.drawParagraph(_paragraph, _position);
   }
 
   @override
   bool shouldRepaint(material.CustomPainter oldDelegate) {
     var old = oldDelegate as SizePainter;
 
-    return _position != old._position;
+    return distance != old.distance || _position != old._position;
   }
 }
 
