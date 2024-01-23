@@ -160,22 +160,24 @@ class _Measurements extends StatelessWidget {
 
   void _setBackgroundImageToBloc(BuildContext context, double zoom) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (_childKey.currentContext != null) {
-        var boundary =
-            _childKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+      Future.delayed(const Duration(seconds: 1), () async {
+        if (_childKey.currentContext != null) {
+          var boundary = _childKey.currentContext!.findRenderObject()
+              as RenderRepaintBoundary;
 
-        if (boundary.size.width > 0.0 && boundary.size.height > 0.0) {
-          final pixelRatio =
-              min(10.0, max(1.0, magnificationZoomFactor * zoom));
-          final image = await boundary.toImage(pixelRatio: pixelRatio);
-          if (image.width > 0) {
-            BlocProvider.of<MetadataBloc>(context)
-                .add(MetadataBackgroundEvent(image, boundary.size));
+          if (boundary.size.width > 0.0 && boundary.size.height > 0.0) {
+            final pixelRatio =
+                min(10.0, max(1.0, magnificationZoomFactor * zoom));
+            final image = await boundary.toImage(pixelRatio: pixelRatio);
+            if (image.width > 0) {
+              BlocProvider.of<MetadataBloc>(context)
+                  .add(MetadataBackgroundEvent(image, boundary.size));
+            }
+          } else {
+            _logger.log('image dimensions are 0');
           }
-        } else {
-          _logger.log('image dimensions are 0');
         }
-      }
+      });
     });
   }
 
