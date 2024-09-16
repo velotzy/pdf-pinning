@@ -3,5 +3,5 @@
 
 import 'package:flutter/material.dart';
 
-const unselectedColor = Color(0xffeb743f);
-const selectedColor = Color(0xffb34512);
+const unselectedColor = Colors.grey;
+const selectedColor = Colors.blue;

@@ -33,6 +33,7 @@ flutter:
   assets:
     - assets/images/floorplan448x449mm.png
     - assets/images/tech_draw.png
+    - assets/images/pin_point.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

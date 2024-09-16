@@ -72,7 +72,7 @@ class MeasurementRepository {
 
   Stream<DrawingHolder> get drawingHolder => _drawingHolder.stream;
 
-  void registerDownEvent(Offset globalPosition, bool isPerimeter) {
+  void registerDownEvent(Offset globalPosition,) {
     if (_currentState != TouchState.FREE) return;
     _currentState = TouchState.DOWN;
 
@@ -89,19 +89,19 @@ class MeasurementRepository {
                   globalPosition)
               .distance >
           40.0) {
-        _currentIndex = _addNewPoint(documentLocalCenteredPosition, isPerimeter);
+        _currentIndex = _addNewPoint(documentLocalCenteredPosition, );
       } else {
         _currentIndex = closestIndex;
         _updatePoint(documentLocalCenteredPosition);
       }
     } else {
-      _currentIndex = _addNewPoint(documentLocalCenteredPosition, isPerimeter);
+      _currentIndex = _addNewPoint(documentLocalCenteredPosition, );
     }
 
     _movementStarted(_currentIndex);
   }
 
-  void registerMoveEvent(Offset position, bool isPerimeter) {
+  void registerMoveEvent(Offset position,) {
     if (_currentState != TouchState.DOWN && _currentState != TouchState.MOVE)
       return;
     _currentState = TouchState.MOVE;
@@ -110,7 +110,7 @@ class MeasurementRepository {
         position, _viewCenterPosition));
   }
 
-  void registerUpEvent(Offset position, bool isPerimeter) {
+  void registerUpEvent(Offset position,) {
     if (_currentState != TouchState.DOWN && _currentState != TouchState.MOVE)
       return;
     _currentState = TouchState.UP;
@@ -194,9 +194,8 @@ class MeasurementRepository {
     _drawingHolder.add(DrawingHolder(relativePoints, _distances.value));
   }
 
-  int _addNewPoint(Offset point, bool isPerimeter) {
+  int _addNewPoint(Offset point,) {
     _absolutePoints.add(point);
-    _listType.add(isPerimeter);
     _publishPoints();
 
     _logger.log('added point: $_absolutePoints');

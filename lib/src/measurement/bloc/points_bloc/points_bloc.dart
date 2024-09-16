@@ -98,7 +98,7 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
       if (event is PointsOnlyEvent) {
         emit( PointsOnlyState(event.points));
       } else if (event is PointsAndDistancesEvent) {
-        emit( _mapMultiplePointsWithDistancesToState(event));
+        emit( PointsOnlyState(event.points));
       }
     }
   }

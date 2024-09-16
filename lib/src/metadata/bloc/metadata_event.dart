@@ -25,14 +25,14 @@ class MetadataBackgroundEvent extends MetadataEvent {
 }
 
 class MetadataStartedEvent extends MetadataEvent {
-  final bool measure;
+  
   final bool showDistances;
   final MeasurementInformation measurementInformation;
   final MagnificationStyle magnificationStyle;
   final MeasurementController controller;
 
   MetadataStartedEvent({
-    required this.measure,
+    
     required this.showDistances,
     required this.measurementInformation,
     required this.magnificationStyle,
@@ -43,7 +43,7 @@ class MetadataStartedEvent extends MetadataEvent {
   List<Object> get props => [
         measurementInformation,
         controller,
-        measure,
+        
         showDistances,
         magnificationStyle,
       ];
@@ -51,7 +51,7 @@ class MetadataStartedEvent extends MetadataEvent {
   @override
   String toString() {
     return super.toString() +
-        ' MeasurementInformation: $measurementInformation, measure: $measure, showDistances: $showDistances, magnificationStyle: $magnificationStyle';
+        ' MeasurementInformation: $measurementInformation, showDistances: $showDistances, magnificationStyle: $magnificationStyle';
   }
 }
 

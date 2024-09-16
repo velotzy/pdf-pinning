@@ -43,16 +43,16 @@ class InputBloc extends Bloc<InputEvent, InputState> {
             _delete = true;
           }
 
-          _measurementRepository.registerDownEvent(event.position, event. isPerimeter);
+          _measurementRepository.registerDownEvent(event.position, );
           break;
         case InputMoveEvent:
-          _measurementRepository.registerMoveEvent(event.position, event.isPerimeter);
+          _measurementRepository.registerMoveEvent(event.position, );
           break;
         case InputUpEvent:
           if (_delete && _metadataRepository.isInDeleteRegion(event.position)) {
             _measurementRepository.removeCurrentPoint();
           } else {
-            _measurementRepository.registerUpEvent(event.position, event.isPerimeter);
+            _measurementRepository.registerUpEvent(event.position, );
           }
           break;
         default:

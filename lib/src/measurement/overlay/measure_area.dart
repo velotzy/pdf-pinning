@@ -57,9 +57,9 @@ class MeasureArea extends StatelessWidget {
         BlocBuilder<PointsBloc, PointsState>(
           builder: (context, state) => _pointsOverlay(state),
         ),
-        BlocBuilder<MagnificationBloc, MagnificationState>(
-          builder: (context, state) => _magnificationOverlay(state),
-        ),
+        // BlocBuilder<MagnificationBloc, MagnificationState>(
+        //   builder: (context, state) => _magnificationOverlay(state),
+        // ),
       ],
     );
   }
@@ -76,10 +76,6 @@ class MeasureArea extends StatelessWidget {
     //   widgets.addAll(_pointsAndPolygonWithSpace(state));
     // } else if (state is PointsAndDistanceState) {
     //   widgets.addAll(_pointsAndPolygon(state));
-    }  else if (state is PointsAndDistanceActiveState) {
-      widgets.addAll(_pointsAndDistancesWithSpace(state));
-    } else if (state is PointsAndDistanceState) {
-      widgets.addAll(_pointsAndDistances(state));
     }
 
     return Stack(
@@ -105,56 +101,6 @@ return entry.value;
     return widgets;
   }
 
-  Iterable<Widget> _pointsAndDistancesWithSpace(
-      PointsAndDistanceActiveState state) {
-    var widgets = <Widget>[];
-    final listType = measurementRepository.getListType();
-
-    state.holders.asMap().forEach((index, holder) {
-      
-      if (listType[index] == true) {
-        if (index % 2 == 0) {
-          widgets.add(_sizePainter(
-              holder.start, holder.end, holder.distance, state.tolerance, state.viewCenter));
-        }
-        widgets.add(_polygonPainter(holder.start, holder.end, index % 2 == 0));
-      } else {
-        widgets.add(_pointPainter(holder.start, holder.end, index % 2 == 0));
-        if (!state.nullIndices.contains(index) && index % 2 == 0) {
-          widgets.add(_distancePainter(holder.start, holder.end,
-              holder.distance, state.tolerance, state.viewCenter));
-        }
-      }
-      
-    });
-
-    return widgets;
-  }
-
-  List<Widget> _pointsAndDistances(PointsAndDistanceState state) {
-    var widgets = <Widget>[];
-    final listType = measurementRepository.getListType();
-
-    state.holders.asMap().forEach((index, holder) {
-      
-      if (listType[index] == true) {
-        widgets.add(_polygonPainter(holder.start, holder.end, index % 2 == 0));
-        if (index % 2 == 0) {
-          widgets.add(_sizePainter(
-              holder.start, holder.end, holder.distance, state.tolerance, state.viewCenter));
-        }
-      } else {
-        widgets.add(_pointPainter(holder.start, holder.end, index % 2 == 0));
-        if (index % 2 == 0) {
-          widgets.add(_distancePainter(holder.start, holder.end,
-              holder.distance, state.tolerance, state.viewCenter));
-        }
-      }
-    });
-
-    return widgets;
-  }
-
   CustomPaint _pointPainter(dynamic first, dynamic last, bool isDrawPath ) {
     return CustomPaint(
       foregroundPainter: MeasurePainter(
@@ -164,47 +110,6 @@ return entry.value;
         dotPaint: dotPaint,
         pathPaint: pathPaint,
         isDrawPath: isDrawPath
-      ),
-    );
-  }
-
-  CustomPaint _distancePainter(Offset first, Offset last, LengthUnit distance,
-      double tolerance, Offset viewCenter) {
-    return CustomPaint(
-      foregroundPainter: DistancePainter(
-        start: first,
-        end: last,
-        distance: distance,
-        tolerance: tolerance,
-        viewCenter: viewCenter,
-        style: distanceStyle,
-      ),
-    );
-  }
-
-  CustomPaint _sizePainter(Offset first, Offset last, LengthUnit distance,
-      double tolerance, Offset viewCenter) {
-    return CustomPaint(
-      foregroundPainter: SizePainter(
-        start: first,
-        end: last,
-        distance: distance,
-        tolerance: tolerance,
-        viewCenter: viewCenter,
-        style: distanceStyle,
-      ),
-    );
-  }
-
-  CustomPaint _polygonPainter(dynamic first, dynamic last, isDrawRect) {
-    return CustomPaint(
-      foregroundPainter: PolygonPainter(
-        start: first,
-        end: last,
-        style: pointStyle,
-        dotPaint: dotPaint,
-        pathPaint: pathPaint,
-        isDrawRect: isDrawRect
       ),
     );
   }

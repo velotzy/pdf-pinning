@@ -28,7 +28,7 @@ class MetadataBloc extends Bloc<MetadataEvent, MetadataState> {
     if (event is MetadataStartedEvent) {
       _repository.registerStartupValuesChange(
         measurementInformation: event.measurementInformation,
-        measure: event.measure,
+        
         showDistance: event.showDistances,
         controller: event.controller,
         magnificationStyle: event.magnificationStyle,

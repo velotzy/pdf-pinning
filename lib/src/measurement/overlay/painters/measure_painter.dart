@@ -2,6 +2,10 @@
 /// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
 
 import 'dart:ui';
+import 'dart:async';
+import 'dart:ui' as UI;
+
+import 'package:flutter/services.dart';
 
 import 'package:document_measure/src/style/point_style.dart';
 import 'package:flutter/material.dart' as material;
@@ -15,6 +19,8 @@ class MeasurePainter extends material.CustomPainter {
 
   final Path _drawPath = Path();
   late double _dotRadius;
+
+  UI.Image? markerImage;
 
   MeasurePainter(
       {required this.start,
@@ -61,14 +67,29 @@ class MeasurePainter extends material.CustomPainter {
     }
   }
 
+  loadUiImage(String imageAssetPath) {
+    // final Completer<UI.Image> completer = Completer();
+    rootBundle.load(imageAssetPath).then((data) =>
+        UI.decodeImageFromList(Uint8List.view(data.buffer), (UI.Image img) {
+          markerImage = img;
+        }));
+  }
+
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.drawCircle(start, _dotRadius, dotPaint);
-    canvas.drawCircle(end, _dotRadius, dotPaint);
-    if (isDrawPath) {
-      canvas.drawPath(_drawPath, pathPaint);
+    if (markerImage == null) {
+      loadUiImage('assets/images/pin_point.png');
     }
-    
+
+    if (markerImage != null) {
+      canvas.drawImage(
+          markerImage!, Offset(end.dx - 10, end.dy - 27), dotPaint);
+      canvas.drawImage(
+          markerImage!, Offset(start.dx - 10, start.dy - 27), dotPaint);
+    } else {
+      canvas.drawCircle(start, _dotRadius, dotPaint);
+      canvas.drawCircle(end, _dotRadius, dotPaint);
+    }
   }
 
   @override

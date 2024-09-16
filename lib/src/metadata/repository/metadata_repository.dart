@@ -99,14 +99,14 @@ class MetadataRepository {
 
   void registerStartupValuesChange({
     required MeasurementInformation measurementInformation,
-    required bool measure,
+    
     required bool showDistance,
     required MagnificationStyle magnificationStyle,
     required MeasurementController controller,
   }) {
     _measurementInformation.value = measurementInformation;
     _unitOfMeasurement.value = measurementInformation.targetLengthUnit;
-    _enableMeasure.value = measure;
+    
     _showDistance.value = showDistance;
     _magnificationRadius.value = magnificationStyle.magnificationRadius +
         magnificationStyle.outerCircleThickness;

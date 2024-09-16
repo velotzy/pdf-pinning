@@ -77,56 +77,13 @@ class _MyAppState extends State<MyApp> {
                   title = originalTitle;
                 }),
                 icon: Icon(
-                  Icons.straighten,
+                  Icons.pinch,
                   color: getButtonColor(
                     measure,
                   ),
                 ),
               ),
-              IconButton(
-                onPressed: () =>
-                    setState(() => showDistanceOnLine = !showDistanceOnLine),
-                icon: Icon(
-                  Icons.vertical_align_bottom,
-                  color: getButtonColor(showDistanceOnLine),
-                ),
-              ),
-              SizedBox.fromSize(
-                child: MaterialButton(
-                  shape: CircleBorder(),
-                  onPressed: () =>
-                      setState(() => showTolerance = !showTolerance),
-                  child: Text('±'),
-                  textColor: getButtonColor(showTolerance),
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                size: Size(52, 52),
-              ),
-              SizedBox.fromSize(
-                child: MaterialButton(
-                  shape: RoundedRectangleBorder(borderRadius:BorderRadius.circular(4.0) ),
-                  onPressed: () => setState(() =>
-                      unitIndex = (unitIndex + 1) % unitsOfMeasurement.length),
-                  child: Text(unitsOfMeasurement[unitIndex].getAbbreviation()),
-                  textColor: unselectedColor,
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                size: Size(64, 64),
-              ),
-              IconButton(
-                  onPressed: () {
-                    if (zoomed) {
-                      controller.resetZoom();
-                    } else {
-                      controller.zoomToLifeSize();
-                    }
-
-                    setState(() {
-                      zoomed = !zoomed;
-                    });
-                  },
-                  icon:
-                      Icon(Icons.zoom_out_map, color: getButtonColor(zoomed))),
+              
                       IconButton(
                 onPressed: () {
                   controller.clear();
@@ -150,7 +107,7 @@ class _MyAppState extends State<MyApp> {
             //   Icons.delete,
             //   color: Colors.red,
             // ),
-            // margin: EdgeInsets.only(bottom: 40),
+            margin: EdgeInsets.only(bottom: 40),
           ),
             measurementInformation: MeasurementInformation(
               scale: 1 / 1.0,
@@ -160,32 +117,9 @@ class _MyAppState extends State<MyApp> {
             ),
             
             controller: listController[_selectedIndex],
-            showDistanceOnLine: showDistanceOnLine,
-            distanceStyle: DistanceStyle(
-              showTolerance: showTolerance,
-            ),
-            measure: true,
-            isPerimeter: measure,
+            showDistanceOnLine: true,
           ),
-        bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.business),
-            label: 'Business',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.school),
-            label: 'School',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.amber[800],
-        onTap: _onItemTapped,
-      ),
+        
       ),
     );
   }

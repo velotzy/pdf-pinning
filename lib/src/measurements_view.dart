@@ -64,8 +64,7 @@ class Measurements extends StatelessWidget {
   final Widget child;
   final Widget deleteChild;
   final Alignment deleteChildAlignment;
-  final bool measure;
-  final bool isPerimeter;
+  
   final bool showDistanceOnLine;
   final MeasurementInformation measurementInformation;
   final double magnificationZoomFactor;
@@ -79,8 +78,7 @@ class Measurements extends StatelessWidget {
     required this.child,
     this.deleteChild = const _DeleteChild(),
     this.deleteChildAlignment = Alignment.bottomCenter,
-    this.measure = true,
-    this.isPerimeter = false,
+    
     this.showDistanceOnLine = true,
     this.measurementInformation = const MeasurementInformation.dinA4(),
     this.magnificationZoomFactor = 2.0,
@@ -110,8 +108,7 @@ class Measurements extends StatelessWidget {
         child,
         deleteChild,
         deleteChildAlignment,
-        measure,
-        isPerimeter,
+        
         showDistanceOnLine,
         measurementInformation,
         magnificationZoomFactor,
@@ -133,8 +130,7 @@ class _Measurements extends StatelessWidget {
   final Widget child;
   final Widget deleteChild;
   final Alignment deleteChildAlignment;
-  final bool measure;
-  final bool isPerimeter;
+  
   final bool showDistanceOnLine;
   final MeasurementInformation measurementInformation;
   final double magnificationZoomFactor;
@@ -147,8 +143,7 @@ class _Measurements extends StatelessWidget {
     this.child,
     this.deleteChild,
     this.deleteChildAlignment,
-    this.measure,
-    this.isPerimeter,
+    
     this.showDistanceOnLine,
     this.measurementInformation,
     this.magnificationZoomFactor,
@@ -205,7 +200,7 @@ class _Measurements extends StatelessWidget {
   void _setStartupArgumentsToBloc(BuildContext context) {
     BlocProvider.of<MetadataBloc>(context).add(MetadataStartedEvent(
       measurementInformation: measurementInformation,
-      measure: measure,
+      
       showDistances: showDistanceOnLine,
       magnificationStyle: magnificationStyle,
       controller: controller!,
@@ -238,19 +233,22 @@ class _Measurements extends StatelessWidget {
               create: (context) =>
                   MagnificationBloc(BlocProvider.of<InputBloc>(context))),
         ],
-        child: Listener(
+        child: 
+        Listener(
+          
           onPointerDown: (PointerEvent event) =>
               BlocProvider.of<InputBloc>(context)
-                  .add(InputDownEvent(event.localPosition, isPerimeter)),
+                  .add(InputDownEvent(event.localPosition)),
           onPointerMove: (PointerEvent event) =>
               BlocProvider.of<InputBloc>(context)
-                  .add(InputMoveEvent(event.localPosition, isPerimeter)),
+                  .add(InputMoveEvent(event.localPosition)),
           onPointerUp: (PointerEvent event) {
             BlocProvider.of<InputBloc>(context)
-                  .add(InputUpEvent(event.localPosition, isPerimeter));
+                  .add(InputUpEvent(event.localPosition));
           }
               ,
-          child: Stack(
+          child: 
+          Stack(
             children: <Widget>[
               Transform(
                 transform: scaleState.transform,
@@ -274,14 +272,20 @@ class _Measurements extends StatelessWidget {
                 ),
               ),
               GestureDetector(
+                
                 onScaleStart: (ScaleStartDetails details) =>
                     BlocProvider.of<ScaleBloc>(context)
                         .add(ScaleStartEvent(details.localFocalPoint)),
                 onScaleUpdate: (ScaleUpdateDetails details) =>
                     BlocProvider.of<ScaleBloc>(context).add(ScaleUpdateEvent(
                         details.localFocalPoint, details.scale)),
-                onDoubleTap: () => BlocProvider.of<ScaleBloc>(context)
-                    .add(ScaleDoubleTapEvent()),
+                // onDoubleTap: () => BlocProvider.of<ScaleBloc>(context)
+                //     .add(ScaleDoubleTapEvent()),
+                onDoubleTapDown: (details) {
+                  BlocProvider.of<InputBloc>(context)
+                  .add(InputDownEvent(details.localPosition));
+                },
+                    
               )
             ],
           ),

@@ -26,6 +26,9 @@ dev_dependencies:
 
 flutter:
   assets:
+    - assets/
+    - assets/images/
+    - assets/images/pin_point.png
     - assets/images/example_portrait.png
     - assets/images/example_landscape.png
 
